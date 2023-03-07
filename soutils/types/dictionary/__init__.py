@@ -2,6 +2,10 @@
 from typing import Union as __Union
 
 
+def get_key_data_list(dictionary: dict, key: object) -> list[object]:
+    return [dictionary[k][key] for k in list(dictionary.keys())]
+
+
 def reverse_lookup(dictionary: dict, value: object) -> list[str]:
     return_data: list = []
     for key in list(dictionary.keys()):
