@@ -1,29 +1,58 @@
 from soutils import assets as __assets
+from typing import Union as __Union
+import os as __os
+
+split: str = "-" * 32
+log_dir: str = "./log/"
+log_file: str = __assets.now_time(True) + ".log"
+log_list: list[str] = []
+ljust_user: int = 20
+ljust_type: int = 5
+type_upper: bool = True
 
 
-def custom(values: list[object], msg: object) -> None:
-    print(f"[{']['.join([str(value) for value in values])}] {str(msg)}")
+def init() -> None:
+    if not __os.path.exists(log_dir):
+        __os.mkdir(log_dir)
+    with open(log_dir + log_file, "w", encoding="UTF-8"):
+        pass
 
 
-def custom_set(kvset: dict) -> None:
-    print("-"*32)
-    keys: list[str] = [str(key) for key in list(kvset.keys())]
-    space: int = max([len(key) for key in keys])
-    for key in keys:
-        print(key.ljust(space) + " : " + kvset[key])
-    print("-"*32)
+def write() -> None:
+    global log_list
+    output: str = "\n".join(log_list)
+    print(output)
+    with open(log_dir + log_file, "a", encoding="UTF-8") as WriteFile:
+        WriteFile.write(output + "\n")
+    log_list = []
 
 
-def template(values: list[object], type_: str, msg: object) -> None:
-    output: list[str] = [
+def free(msg: str) -> None:
+    log_list.append(msg)
+
+
+def template(user: __Union[int, str, None], msg: str, log_type: str) -> None:
+    if type_upper:
+        log_type = log_type.upper()
+    output: str = "][".join([
         __assets.now_time(),
-        type_.center(4)
-    ]
-    output[1:1] = values
-    custom(output, msg)
+        str(user).ljust(ljust_user),
+        log_type.ljust(ljust_type)
+    ])
+    free("[" + output + "] " + msg)
 
 
-def template_set(kvset: dict) -> None:
-    output: dict = {"Time": __assets.now_time()}
-    output.update(kvset)
-    custom_set(kvset)
+def log(user: __Union[int, str, None], msg: str) -> None:
+    template(user, msg, "LOG")
+
+
+def error(user: __Union[int, str, None], msg: str) -> None:
+    template(user, msg, "ERROR")
+
+
+def warning(user: __Union[int, str, None], msg: str) -> None:
+    template(user, msg, "WARN")
+
+
+def info(user: __Union[int, str, None], msg: str) -> None:
+    template(user, msg, "INFO")
